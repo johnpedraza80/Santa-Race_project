@@ -1,45 +1,39 @@
 # СОЗДАНИЕ ГЛАВНОГО МЕНЮ
-
-
+from PIL import Image
 import pygame
 
 # Параметры окна
-SIZE = WIDTH, HEIGHT = 800, 600
-
-# Параметры кнопки для игры
-X_BUTTON_PLAY, Y_BUTTON_PLAY = 350, 250
-WIDTH_BUTTON_PLAY, HEIGHT_BUTTON_PLAY = 100, 50
+SIZE = WIDTH, HEIGHT = 1400, 788
 
 
 # КЛАСС ДЛЯ СОЗДАНИЯ КНОПОК
 class ImageButton:
-    def __init__(self, x, y, width, height, text):
-        self.top_rect = pygame.Rect(x, y, width, height)
-        self.rect_color = pygame.Color("#475F77")
+    def __init__(self, x, y, image):
         self.x = x
         self.y = y
-        self.text = text
-        self.width = width
-        self.height = height
+        self.image = image
+        im = Image.open(self.image)
+        self.width, self.height = im.size
 
-        self.text_surf = pygame.font.Font(None, 30).render(self.text, True, "#FFFFFF")
-        self.text_rect = self.text_surf.get_rect(center=self.top_rect.center)
+        self.buttons_list = []
 
-    def draw(self, screen):
-        pygame.draw.rect(screen, self.rect_color, self.top_rect)
-        screen.blit(self.text_surf, self.text_rect)
+    def load_button(self, screen):
+        button = pygame.image.load(self.image).convert_alpha()
+        screen.blit(button, (self.x, self.y))
+        self.buttons_list.append((self.x, self.y, self.width, self.height))
 
 
 if __name__ == '__main__':
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
-    screen.fill("#FFFFFF")
-    button_play = ImageButton(X_BUTTON_PLAY, Y_BUTTON_PLAY, WIDTH_BUTTON_PLAY, HEIGHT_BUTTON_PLAY, "PLAY")
-    button_play.draw(screen)
+    BG = pygame.image.load(r"Images/backround.gif").convert_alpha()
+    screen.blit(BG, (0, 0))
+    play_btn = ImageButton(500, 200, r"Images/play_button.png")
+    play_btn.load_button(screen)
     pygame.display.flip()
     running = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-
+        pygame.display.flip()
