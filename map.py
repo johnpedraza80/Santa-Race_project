@@ -6,8 +6,8 @@ import pygame
 import random
 
 # параметры окна и карты
-WIND_WIDTH = 800
-WIND_HEIGHT = 600
+WIND_WIDTH = 1400
+WIND_HEIGHT = 788
 CELL_SIZE = 50
 SIZE = WIND_WIDTH, WIND_HEIGHT
 WIDTH = WIND_WIDTH // CELL_SIZE
@@ -23,11 +23,11 @@ PLAYERCHANGE = 0
 
 random.seed(a=None, version=2)
 
-NewWallCoof = 0 #Коэффицент появления новой стены
+NewWallCoof = 0  # Коэффицент появления новой стены
 
-WALLS_TYPES = [[100, 50], [50, 50], [25, 50]] #Типы препятствий
+WALLS_TYPES = [[100, 50], [50, 50], [25, 50]]  # Типы препятствий
 
-WALLS = [] #Список стенок на экране
+WALLS = []  # Список стенок на экране
 
 
 # загрузка картинки (она должна быть в том же файле что и этот код)
@@ -61,7 +61,7 @@ class Map(pygame.sprite.Sprite):
             self.rect = self.rect.move(num, 0)
             self.number -= 10
 
-            #Двигаем стены
+            # Двигаем стены
             MoveWalls = 0
             while MoveWalls < (len(WALLS)):
                 WALLS[MoveWalls][2] -= 7
@@ -71,13 +71,21 @@ class Map(pygame.sprite.Sprite):
 
                 MoveWalls += 1
 
+
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
 
-if __name__ == '__main__':
+
+def game_scene():
+    global PLAYERPOS
+    global PLAYERVELOCITY
+    global PLAYERCHANGE
+    global NewWallCoof
+
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
     map = Map(WIDTH, HEIGHT, LEFT, TOP, CELL_SIZE)
+
     running = True
     while running:
         for event in pygame.event.get():
@@ -94,27 +102,31 @@ if __name__ == '__main__':
         all_sprites.update()
         clock.tick(50)
 
-        #Рисуем персонажа (кружочек)
+        # Рисуем персонажа (кружочек)
 
         pygame.draw.circle(screen, (255, 255, 255), (200, PLAYERPOS), 15)
 
-        #Рисуем стены
+        # Рисуем стены
 
         for WallsDraw in range(len(WALLS)):
-            pygame.draw.polygon(screen, (255, 255, 255), ((WALLS[WallsDraw][2], WALLS[WallsDraw][3]), (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3]), (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3] + WALLS[WallsDraw][0]), (WALLS[WallsDraw][2], WALLS[WallsDraw][3] + WALLS[WallsDraw][0])))
+            pygame.draw.polygon(screen, (255, 255, 255), (
+                (WALLS[WallsDraw][2], WALLS[WallsDraw][3]), (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3]),
+                (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3] + WALLS[WallsDraw][0]),
+                (WALLS[WallsDraw][2], WALLS[WallsDraw][3] + WALLS[WallsDraw][0])))
         pygame.display.flip()
-        #Добавляем новую стену
+        # Добавляем новую стену
 
         WillAppearNewWall = random.randint(0, NewWallCoof)
         if WillAppearNewWall == 0:
             TypeOfNewWall = random.randint(0, 2)
-            WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 800, random.randint(0, 600 - WALLS_TYPES[TypeOfNewWall][0])])
+            WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 800,
+                          random.randint(0, 600 - WALLS_TYPES[TypeOfNewWall][0])])
             NewWallCoof = 225 // (400 // WALLS_TYPES[TypeOfNewWall][0])
 
         else:
             NewWallCoof -= 1
 
-        #Изменение скорости игрока
+            # Изменение скорости игрока
             if PLAYERCHANGE == 1 and PLAYERPOS > 50:
                 PLAYERVELOCITY -= 0.5
 
@@ -131,3 +143,5 @@ if __name__ == '__main__':
 
             PLAYERPOS += PLAYERVELOCITY
     pygame.display.flip()
+
+

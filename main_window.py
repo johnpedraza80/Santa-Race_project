@@ -38,6 +38,7 @@ class Menu:
         self.im = Image.open(self.bg_image)
         self.bg = pygame.image.load(self.bg_image)
         self.sound = pygame.mixer.Sound(BACKROUND_MUSIC)
+        self.flag = True
 
     def load_bg(self):
         # Загрузка заднего фона
@@ -67,6 +68,7 @@ class Play(pygame.sprite.Sprite):
         if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
                 self.rect.collidepoint(args[0].pos):
             self.sound.play(0)
+            self.flag = False
 
 
 if __name__ == '__main__':
@@ -77,6 +79,7 @@ if __name__ == '__main__':
     button_play = Play(all_sprites)
     all_sprites.draw(menu.screen)
     running = True
+
     while running:
         all_sprites.update()
         for event in pygame.event.get():
@@ -84,5 +87,9 @@ if __name__ == '__main__':
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 all_sprites.update(event)
+                if menu.flag:
+                    running = False
 
         pygame.display.flip()
+    menu.sound.stop()
+    map.game_scene()
