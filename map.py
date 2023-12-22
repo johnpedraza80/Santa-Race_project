@@ -1,4 +1,4 @@
-# СОЗДАНИЕ КАРТЫ
+# карта
 import os
 
 import pygame
