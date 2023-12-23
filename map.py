@@ -122,7 +122,6 @@ def game_scene():
             WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 800,
                           random.randint(0, 600 - WALLS_TYPES[TypeOfNewWall][0])])
             NewWallCoof = 225 // (400 // WALLS_TYPES[TypeOfNewWall][0])
-
         else:
             NewWallCoof -= 1
 

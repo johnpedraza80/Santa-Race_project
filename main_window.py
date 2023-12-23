@@ -73,6 +73,7 @@ class Play(pygame.sprite.Sprite):
 
 if __name__ == '__main__':
     pygame.init()
+
     menu = Menu(SIZE, BACKROUND_IMAGE)
     menu.play_music()
     menu.load_bg()
@@ -80,8 +81,15 @@ if __name__ == '__main__':
     all_sprites.draw(menu.screen)
     running = True
 
+    image = load_image("cursor.png")
+    arrow = pygame.sprite.Sprite(all_sprites)
+    arrow.image = image
+    arrow.rect = arrow.image.get_rect()
+    pygame.mouse.set_visible(False)
+
     while running:
         all_sprites.update()
+        all_sprites.draw(menu.screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -89,7 +97,11 @@ if __name__ == '__main__':
                 all_sprites.update(event)
                 if menu.flag:
                     running = False
+                    menu.sound.stop()
+                    map.game_scene()
+            if event.type == pygame.MOUSEMOTION:
+                arrow.rect.topleft = event.pos
+        # if pygame.mouse.get_focused():
 
         pygame.display.flip()
-    menu.sound.stop()
-    map.game_scene()
+        menu.load_bg()
