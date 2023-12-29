@@ -17,6 +17,8 @@ TOP = 0
 BG_COLOR = pygame.Color(0, 0, 0)
 MAP_PICT = "map.png"
 
+Santa = pygame.image.load('Images/SantaTexture.png')
+
 PLAYERPOS = 550
 PLAYERVELOCITY = 0
 PLAYERCHANGE = 0
@@ -25,9 +27,13 @@ random.seed(a=None, version=2)
 
 NewWallCoof = 0  # Коэффицент появления новой стены
 
-WALLS_TYPES = [[100, 50], [50, 50], [25, 50]]  # Типы препятствий
+WALLS_TYPES = [[250, 50], [175, 50], [125, 50]]  # Типы препятствий
 
 WALLS = []  # Список стенок на экране
+
+PlayerColor = 255
+
+DONTLOSE = 1
 
 
 # загрузка картинки (она должна быть в том же файле что и этот код)
@@ -61,16 +67,6 @@ class Map(pygame.sprite.Sprite):
             self.rect = self.rect.move(num, 0)
             self.number -= 10
 
-            # Двигаем стены
-            MoveWalls = 0
-            while MoveWalls < (len(WALLS)):
-                WALLS[MoveWalls][2] -= 7
-                if WALLS[MoveWalls][2] < -50:
-                    WALLS.remove(WALLS[MoveWalls])
-                    MoveWalls -= 1
-
-                MoveWalls += 1
-
 
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
@@ -81,6 +77,8 @@ def game_scene():
     global PLAYERVELOCITY
     global PLAYERCHANGE
     global NewWallCoof
+    global PlayerColor
+    global DONTLOSE
 
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
@@ -103,13 +101,16 @@ def game_scene():
         clock.tick(50)
 
         # Рисуем персонажа (кружочек)
-
-        pygame.draw.circle(screen, (255, 255, 255), (200, PLAYERPOS), 15)
+        if DONTLOSE == 1:
+            # pygame.draw.circle(screen, (PlayerColor, PlayerColor, PlayerColor), (200, PLAYERPOS), 15)
+            iu = pygame.transform.rotozoom(Santa, -PLAYERVELOCITY * 3, 2)
+            iur = iu.get_rect(centerx=200, centery=PLAYERPOS)
+            screen.blit(iu, iur)
 
         # Рисуем стены
 
         for WallsDraw in range(len(WALLS)):
-            pygame.draw.polygon(screen, (255, 255, 255), (
+            pygame.draw.polygon(screen, (200, 255, 55), (
                 (WALLS[WallsDraw][2], WALLS[WallsDraw][3]), (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3]),
                 (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3] + WALLS[WallsDraw][0]),
                 (WALLS[WallsDraw][2], WALLS[WallsDraw][3] + WALLS[WallsDraw][0])))
@@ -119,9 +120,9 @@ def game_scene():
         WillAppearNewWall = random.randint(0, NewWallCoof)
         if WillAppearNewWall == 0:
             TypeOfNewWall = random.randint(0, 2)
-            WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 800,
-                          random.randint(0, 600 - WALLS_TYPES[TypeOfNewWall][0])])
-            NewWallCoof = 225 // (400 // WALLS_TYPES[TypeOfNewWall][0])
+            WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 1400,
+                          random.randint(0, 788 - WALLS_TYPES[TypeOfNewWall][0])])
+            NewWallCoof = 50 // (400 // WALLS_TYPES[TypeOfNewWall][0])
         else:
             NewWallCoof -= 1
 
@@ -129,11 +130,11 @@ def game_scene():
             if PLAYERCHANGE == 1 and PLAYERPOS > 50:
                 PLAYERVELOCITY -= 0.5
 
-            if PLAYERCHANGE == 0 and PLAYERPOS < 550:
+            if PLAYERCHANGE == 0 and PLAYERPOS < 750:
                 PLAYERVELOCITY += 0.5
 
-            if PLAYERPOS > 585:
-                PLAYERPOS = 585
+            if PLAYERPOS > 788 - 15:
+                PLAYERPOS = 788 - 15
                 PLAYERVELOCITY = 0
 
             if PLAYERPOS < 15:
@@ -141,6 +142,24 @@ def game_scene():
                 PLAYERVELOCITY = 0
 
             PLAYERPOS += PLAYERVELOCITY
+
+            # Двигаем стены
+            MoveWalls = 0
+            while MoveWalls < (len(WALLS)):
+                WALLS[MoveWalls][2] -= 10 * DONTLOSE
+                if WALLS[MoveWalls][2] < -50:
+                    WALLS.remove(WALLS[MoveWalls])
+                    MoveWalls -= 1
+
+                MoveWalls += 1
+
+        for i in range(len(WALLS)):
+            if (WALLS[i][2] < 200 and WALLS[i][2] + 50 >= 188) and WALLS[i][3] < PLAYERPOS + 7 and WALLS[i][3] + \
+                    WALLS[i][0] > PLAYERPOS - 7:
+                PlayerColor = 0
+                DONTLOSE = 0
+
+
     pygame.display.flip()
 
-
+game_scene()
