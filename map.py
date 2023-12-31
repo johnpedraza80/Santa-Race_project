@@ -64,6 +64,7 @@ class Map(pygame.sprite.Sprite):
     # обновление экрана (картинка сдвигается << на 10)
     def update(self, num=-10):
         if True:
+            num *= DONTLOSE
             self.rect = self.rect.move(num, 0)
             self.number -= 10
 
@@ -159,7 +160,4 @@ def game_scene():
                 PlayerColor = 0
                 DONTLOSE = 0
 
-
     pygame.display.flip()
-
-game_scene()
