@@ -1,9 +1,7 @@
-# карта
 import os
+import random
 
 import pygame
-
-import random
 
 # параметры окна и карты
 WIND_WIDTH = 1400
@@ -15,7 +13,7 @@ HEIGHT = WIND_HEIGHT // CELL_SIZE
 LEFT = 0
 TOP = 0
 BG_COLOR = pygame.Color(0, 0, 0)
-MAP_PICT = "map.png"
+map_flag = True
 
 Santa = pygame.image.load('Images/SantaTexture.png')
 
@@ -38,39 +36,34 @@ DONTLOSE = 1
 
 # загрузка картинки (она должна быть в том же файле что и этот код)
 
-def picture(flag=True, name=MAP_PICT):
-    if flag:
-        fullname = os.path.join('Images', name)
-        image = pygame.image.load(fullname)
-        return image
+def picture(name):
+    print(name)
+    fullname = os.path.join('Images', name)
+    image = pygame.image.load(fullname)
+    return image
 
 
 class Map(pygame.sprite.Sprite):
-    image = picture()
+    image = picture(random.choice(['map.png', 'map2.png']))
 
-    def __init__(self, width, height, left, top, cell_size):
+    def __init__(self, all_sprites, num):
         super().__init__(all_sprites)
-        self.width = width
-        self.height = height
-        self.map = [[0] * self.width for _ in range(height)]
-        self.left = left
-        self.top = top
-        self.cell_size = cell_size
         self.image = Map.image
         self.rect = self.image.get_rect()
-        self.mask = pygame.mask.from_surface(self.image)
-        self.number = 4000
+        self.rect.x = num
 
-    # обновление экрана (картинка сдвигается << на 10)
-    def update(self, num=-10):
-        if True:
-            num *= DONTLOSE
-            self.rect = self.rect.move(num, 0)
-            self.number -= 10
+    def update(self):
+        if map_flag:
+            self.rect = self.rect.move(-5, 0)
+            if self.rect.x == 4000:
+                self.image = picture(random.choice(['map2.png', 'map.png']))  # можно добавить другие картинки
 
 
+nums = [0, 4000, 8000, 12000]
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
+for i in range(4):
+    Map(all_sprites, nums[i])
 
 
 def game_scene():
@@ -80,10 +73,10 @@ def game_scene():
     global NewWallCoof
     global PlayerColor
     global DONTLOSE
+    global map_flag
 
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
-    map = Map(WIDTH, HEIGHT, LEFT, TOP, CELL_SIZE)
 
     running = True
     while running:
@@ -159,5 +152,8 @@ def game_scene():
                     WALLS[i][0] > PLAYERPOS - 7:
                 PlayerColor = 0
                 DONTLOSE = 0
+                map_flag = False
 
     pygame.display.flip()
+
+
