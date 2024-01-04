@@ -14,9 +14,8 @@ LEFT = 0
 TOP = 0
 BG_COLOR = pygame.Color(0, 0, 0)
 map_flag = True
-
+backround_music = 'Music/game_music.mp3'
 Santa = pygame.image.load('Images/SantaTexture.png')
-
 PLAYERPOS = 550
 PLAYERVELOCITY = 0
 PLAYERCHANGE = 0
@@ -46,7 +45,7 @@ def picture(name):
 class Map(pygame.sprite.Sprite):
     image = picture(random.choice(['map.png', 'map2.png']))
 
-    def __init__(self, all_sprites, num):
+    def __init__(self, all_sprites, num=0):
         super().__init__(all_sprites)
         self.image = Map.image
         self.rect = self.image.get_rect()
@@ -76,9 +75,19 @@ def game_scene():
     global map_flag
 
     pygame.init()
+    pygame.font.init()
     screen = pygame.display.set_mode(SIZE)
+    sound = pygame.mixer.Sound(backround_music)
+    sound.set_volume(0)
+    sound.play()
+    map = Map(all_sprites)
+    i = 0
+    while i != 0.6:
+        i += 0.1
+        sound.set_volume(i)
 
     running = True
+    loose_flag = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -150,10 +159,13 @@ def game_scene():
         for i in range(len(WALLS)):
             if (WALLS[i][2] < 200 and WALLS[i][2] + 50 >= 188) and WALLS[i][3] < PLAYERPOS + 7 and WALLS[i][3] + \
                     WALLS[i][0] > PLAYERPOS - 7:
+
                 PlayerColor = 0
                 DONTLOSE = 0
+                sound.stop()
                 map_flag = False
 
     pygame.display.flip()
+
 
 

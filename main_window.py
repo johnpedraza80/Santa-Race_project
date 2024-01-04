@@ -1,7 +1,7 @@
 # СОЗДАНИЕ ГЛАВНОГО МЕНЮ
 from PIL import Image
 import pygame
-import map
+import levels
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 import os
@@ -39,7 +39,6 @@ class Menu:
         self.bg = pygame.image.load(self.bg_image)
         self.sound = pygame.mixer.Sound(BACKROUND_MUSIC)
 
-
     def load_bg(self):
         # Загрузка заднего фона
         self.screen.blit(self.bg, (0, 0))
@@ -72,7 +71,6 @@ class Play(pygame.sprite.Sprite):
             self.sound.play(0)
 
 
-
 if __name__ == '__main__':
     pygame.init()
 
@@ -98,10 +96,9 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONDOWN:
                 all_sprites.update(event)
                 if button_play.flag1:
-
                     running = False
-                    menu.sound.stop()
-                    map.game_scene()
+
+                    levels.level_choice()
 
             if event.type == pygame.MOUSEMOTION:
                 arrow.rect.topleft = event.pos
