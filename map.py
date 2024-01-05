@@ -14,8 +14,11 @@ LEFT = 0
 TOP = 0
 BG_COLOR = pygame.Color(0, 0, 0)
 map_flag = True
-backround_music = 'Music/game_music.mp3'
+meters = 1
+hp_count = 15
+
 Santa = pygame.image.load('Images/SantaTexture.png')
+
 PLAYERPOS = 550
 PLAYERVELOCITY = 0
 PLAYERCHANGE = 0
@@ -36,7 +39,6 @@ DONTLOSE = 1
 # загрузка картинки (она должна быть в том же файле что и этот код)
 
 def picture(name):
-    print(name)
     fullname = os.path.join('Images', name)
     image = pygame.image.load(fullname)
     return image
@@ -45,7 +47,7 @@ def picture(name):
 class Map(pygame.sprite.Sprite):
     image = picture(random.choice(['map.png', 'map2.png']))
 
-    def __init__(self, all_sprites, num=0):
+    def __init__(self, all_sprites, num):
         super().__init__(all_sprites)
         self.image = Map.image
         self.rect = self.image.get_rect()
@@ -72,22 +74,14 @@ def game_scene():
     global NewWallCoof
     global PlayerColor
     global DONTLOSE
-    global map_flag
+    global map_flag, meters, hp_count
 
     pygame.init()
-    pygame.font.init()
     screen = pygame.display.set_mode(SIZE)
-    sound = pygame.mixer.Sound(backround_music)
-    sound.set_volume(0)
-    sound.play()
-    map = Map(all_sprites)
-    i = 0
-    while i != 0.6:
-        i += 0.1
-        sound.set_volume(i)
+
+    font = pygame.font.Font(None, 72)
 
     running = True
-    loose_flag = True
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -100,10 +94,17 @@ def game_scene():
 
         screen.fill((0, 0, 0))
         all_sprites.draw(screen)
+        text_hp = font.render(f"{hp_count}", True, (255, 0, 0))
+        text = font.render(f"{meters // 5}", True, (100, 100, 100))
+        if map_flag:
+            meters += 1
+        screen.blit(text, (10, 10))
+        screen.blit(text_hp, (1300, 10))
+
         all_sprites.update()
         clock.tick(50)
 
-        # Рисуем персонажа (кружочек)
+        # Рисуем персонажа
         if DONTLOSE == 1:
             # pygame.draw.circle(screen, (PlayerColor, PlayerColor, PlayerColor), (200, PLAYERPOS), 15)
             iu = pygame.transform.rotozoom(Santa, -PLAYERVELOCITY * 3, 2)
@@ -159,13 +160,14 @@ def game_scene():
         for i in range(len(WALLS)):
             if (WALLS[i][2] < 200 and WALLS[i][2] + 50 >= 188) and WALLS[i][3] < PLAYERPOS + 7 and WALLS[i][3] + \
                     WALLS[i][0] > PLAYERPOS - 7:
-
-                PlayerColor = 0
-                DONTLOSE = 0
-                sound.stop()
-                map_flag = False
+                if hp_count != 0:
+                    hp_count -= 1
+                else:
+                    PlayerColor = 0
+                    DONTLOSE = 0
+                    map_flag = False
 
     pygame.display.flip()
 
 
-
+game_scene()
