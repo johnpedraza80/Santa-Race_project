@@ -17,6 +17,7 @@ map_flag = True
 meters = 1
 hp_count = 15
 
+backround_snd = "Music/game_music.mp3"
 Santa = pygame.image.load('Images/SantaTexture.png')
 
 PLAYERPOS = 550
@@ -47,7 +48,7 @@ def picture(name):
 class Map(pygame.sprite.Sprite):
     image = picture(random.choice(['map.png', 'map2.png']))
 
-    def __init__(self, all_sprites, num):
+    def __init__(self, all_sprites, num=0):
         super().__init__(all_sprites)
         self.image = Map.image
         self.rect = self.image.get_rect()
@@ -80,6 +81,14 @@ def game_scene():
     screen = pygame.display.set_mode(SIZE)
 
     font = pygame.font.Font(None, 72)
+    sound = pygame.mixer.Sound(backround_snd)
+    sound.set_volume(0)
+    sound.play()
+    map = Map(all_sprites)
+    i = 0
+    while i != 0.6:
+        i += 0.1
+        sound.set_volume(i)
 
     running = True
     while running:
