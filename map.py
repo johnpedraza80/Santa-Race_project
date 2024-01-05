@@ -16,7 +16,6 @@ BG_COLOR = pygame.Color(0, 0, 0)
 map_flag = True
 meters = 1
 hp_count = 15
-
 backround_snd = "Music/game_music.mp3"
 Santa = pygame.image.load('Images/SantaTexture.png')
 
