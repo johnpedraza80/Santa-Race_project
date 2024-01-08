@@ -1,7 +1,8 @@
 # СОЗДАНИЕ ГЛАВНОГО МЕНЮ
 from PIL import Image
 import pygame
-import levels
+from levels import level_choice
+import music_play
 
 pygame.mixer.pre_init(44100, -16, 1, 512)
 import os
@@ -13,6 +14,7 @@ BACKROUND_IMAGE = "Images/backround.gif"
 BACKROUND_MUSIC = "Music/backround_music.mp3"
 PLAY_BUTTON = "play_button.png"
 CLICK_SOUND = "Music/click.mp3"
+EXIT_BTN = "exit.png"
 
 
 def load_image(name, colorkey=None):
@@ -37,16 +39,10 @@ class Menu:
         self.bg_image = bg_image
         self.im = Image.open(self.bg_image)
         self.bg = pygame.image.load(self.bg_image)
-        self.sound = pygame.mixer.Sound(BACKROUND_MUSIC)
 
     def load_bg(self):
         # Загрузка заднего фона
         self.screen.blit(self.bg, (0, 0))
-
-    def play_music(self):
-        # Проигрыватель музыки главного меню
-        self.sound.play(-1)
-        self.sound.set_volume(0.4)
 
 
 all_sprites = pygame.sprite.Group()
@@ -71,13 +67,32 @@ class Play(pygame.sprite.Sprite):
             self.sound.play(0)
 
 
+class Exit(pygame.sprite.Sprite):
+    button_exit = load_image(EXIT_BTN)
+
+    def __init__(self, group):
+        super().__init__(group)
+        self.image = Exit.button_exit
+        self.rect = self.image.get_rect()
+        self.rect.x = 290
+        self.rect.y = 400
+        self.sound = pygame.mixer.Sound(CLICK_SOUND)
+        self.flag1 = False
+
+    def update(self, *args):
+        if args and args[0].type == pygame.MOUSEBUTTONDOWN and \
+                self.rect.collidepoint(args[0].pos):
+            self.sound.play(0)
+            self.flag1 = True
+
+
 if __name__ == '__main__':
     pygame.init()
-
     menu = Menu(SIZE, BACKROUND_IMAGE)
-    menu.play_music()
     menu.load_bg()
+    music_play.sound.play(-1)
     button_play = Play(all_sprites)
+    button_exit = Exit(all_sprites)
     all_sprites.draw(menu.screen)
     running = True
 
@@ -88,7 +103,6 @@ if __name__ == '__main__':
     pygame.mouse.set_visible(False)
 
     while running:
-        all_sprites.update()
         all_sprites.draw(menu.screen)
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -96,9 +110,10 @@ if __name__ == '__main__':
             if event.type == pygame.MOUSEBUTTONDOWN:
                 all_sprites.update(event)
                 if button_play.flag1:
+                    level_choice()
                     running = False
-
-                    levels.level_choice()
+                if button_exit.flag1:
+                    running = False
 
             if event.type == pygame.MOUSEMOTION:
                 arrow.rect.topleft = event.pos
