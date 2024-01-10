@@ -74,8 +74,8 @@ class Exit(pygame.sprite.Sprite):
         super().__init__(group)
         self.image = Exit.button_exit
         self.rect = self.image.get_rect()
-        self.rect.x = 290
-        self.rect.y = 400
+        self.rect.x = 500
+        self.rect.y = 500
         self.sound = pygame.mixer.Sound(CLICK_SOUND)
         self.flag1 = False
 
@@ -116,6 +116,8 @@ if __name__ == '__main__':
                     running = False
 
             if event.type == pygame.MOUSEMOTION:
+                with open("coords.txt", "w") as file:
+                    file.write(str(event.pos[0]) + " " + str(event.pos[1]))
                 arrow.rect.topleft = event.pos
 
         pygame.display.flip()

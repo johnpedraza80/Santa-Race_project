@@ -26,6 +26,7 @@ class Levels(pygame.sprite.Sprite):
         super().__init__(group)
         self.image = Levels.button
         self.rect = self.image.get_rect()
+        self.mask = pygame.mask.from_surface(self.image)
         self.rect.x = WIDTH // 2 - 200
         self.rect.y = HEIGHT // 2 - 150
         self.sound = pygame.mixer.Sound(CLICK_SOUND)
@@ -36,6 +37,14 @@ class Levels(pygame.sprite.Sprite):
                 self.rect.collidepoint(args[0].pos):
             self.flag1 = True
             self.sound.play(0)
+
+
+def first_coords():
+    with open("coords.txt", "r") as file:
+        reader = file.readline()
+        reader = int(reader.split()[0]), int(reader.split()[1])
+
+        return reader
 
 
 all_sprites = pygame.sprite.Group()
@@ -50,7 +59,10 @@ def level_choice():
     image = load_image("cursor.png")
     arrow = pygame.sprite.Sprite(all_sprites)
     arrow.image = image
+
     arrow.rect = arrow.image.get_rect()
+    print(type(first_coords()), print(first_coords()))
+    arrow.rect.topleft = first_coords()
     pygame.mouse.set_visible(False)
     running = True
     while running:
