@@ -208,7 +208,7 @@ def game_scene():
                     PlayerColor = 0
                     DONTLOSE = 0
                     map_flag = False
-                print((WALLS[i][0], WALLS[i][2]))
+
                 create_particles((200, PLAYERPOS))
                 del_wall = i
 
