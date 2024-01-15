@@ -61,7 +61,7 @@ def level_choice():
     arrow.image = image
 
     arrow.rect = arrow.image.get_rect()
-    print(type(first_coords()), print(first_coords()))
+
     arrow.rect.topleft = first_coords()
     pygame.mouse.set_visible(False)
     running = True

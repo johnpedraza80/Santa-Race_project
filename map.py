@@ -15,9 +15,10 @@ TOP = 0
 BG_COLOR = pygame.Color(0, 0, 0)
 map_flag = True
 meters = 1
-hp_count = 15
+hp_count = 3
 backround_snd = "Music/game_music.mp3"
 Santa = pygame.image.load('Images/SantaTexture.png')
+GRAVITY = 0.5
 
 PLAYERPOS = 550
 PLAYERVELOCITY = 0
@@ -55,12 +56,41 @@ class Map(pygame.sprite.Sprite):
 
     def update(self):
         if map_flag:
-            self.rect = self.rect.move(-5, 0)
+            self.rect = self.rect.move(-5, 0)  # сдвиг картинки
             if self.rect.x == 4000:
                 self.image = picture(random.choice(['map2.png', 'map.png']))  # можно добавить другие картинки
 
 
-nums = [0, 4000, 8000, 12000]
+class Particle(pygame.sprite.Sprite):
+    # частицы разного размера
+    fire = [picture("ice_broken.png")]
+    for scale in (5, 10, 20):
+        fire.append(pygame.transform.scale(fire[0], (scale, scale)))
+
+    def __init__(self, pos, dx, dy):
+        super().__init__(all_sprites)
+        self.image = random.choice(self.fire)
+        self.rect = self.image.get_rect()
+        self.velocity = [dx, dy]
+        self.rect.x, self.rect.y = pos
+        self.gravity = GRAVITY
+
+    def update(self):
+        self.velocity[1] += self.gravity
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
+
+
+def create_particles(position):
+    # количество создаваемых частиц
+    particle_count = 30
+    # возможные скорости
+    numbers = range(-5, 6)
+    for _ in range(particle_count):
+        Particle(position, random.choice(numbers), random.choice(numbers))
+
+
+nums = [0, 4000, 8000, 12000]  # кол-во пикселей через которое появляется новая картинка
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
 for i in range(4):
@@ -83,7 +113,7 @@ def game_scene():
     sound = pygame.mixer.Sound(backround_snd)
     sound.set_volume(0)
     sound.play()
-    map = Map(all_sprites)
+    Map(all_sprites)
     i = 0
     while i != 0.6:
         i += 0.1
@@ -164,7 +194,11 @@ def game_scene():
                     MoveWalls -= 1
 
                 MoveWalls += 1
-
+        del_wall = 100  # число которое больше количества стенок
+        if hp_count == 0:
+            PlayerColor = 0
+            DONTLOSE = 0
+            map_flag = False
         for i in range(len(WALLS)):
             if (WALLS[i][2] < 200 and WALLS[i][2] + 50 >= 188) and WALLS[i][3] < PLAYERPOS + 7 and WALLS[i][3] + \
                     WALLS[i][0] > PLAYERPOS - 7:
@@ -174,8 +208,11 @@ def game_scene():
                     PlayerColor = 0
                     DONTLOSE = 0
                     map_flag = False
+                print((WALLS[i][0], WALLS[i][2]))
+                create_particles((200, PLAYERPOS))
+                del_wall = i
+
+        if del_wall != 100:
+            del WALLS[del_wall]
 
     pygame.display.flip()
-
-
-
