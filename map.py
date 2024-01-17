@@ -32,6 +32,7 @@ WALLS_TYPES = [[250, 50], [175, 50], [125, 50]]  # Типы препятстви
 
 WALLS = []  # Список стенок на экране
 
+NEW_WALL_HEIGHT = 0
 PlayerColor = 255
 
 DONTLOSE = 1
@@ -105,6 +106,7 @@ def game_scene():
     global PlayerColor
     global DONTLOSE
     global map_flag, meters, hp_count
+    global NEW_WALL_HEIGHT
 
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
@@ -162,8 +164,11 @@ def game_scene():
         WillAppearNewWall = random.randint(0, NewWallCoof)
         if WillAppearNewWall == 0:
             TypeOfNewWall = random.randint(0, 2)
-            WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 1400,
-                          random.randint(0, 788 - WALLS_TYPES[TypeOfNewWall][0])])
+            WALL_HEIGHT = random.randint(0 + ((1 - NEW_WALL_HEIGHT) * 400), 788 - (NEW_WALL_HEIGHT * 400) -
+                                         WALLS_TYPES[TypeOfNewWall][0])  # Определение высоты новой стенки
+
+            WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 1400, WALL_HEIGHT])
+            NEW_WALL_HEIGHT = 1 - NEW_WALL_HEIGHT
             NewWallCoof = 50 // (400 // WALLS_TYPES[TypeOfNewWall][0])
         else:
             NewWallCoof -= 1
@@ -199,6 +204,7 @@ def game_scene():
             PlayerColor = 0
             DONTLOSE = 0
             map_flag = False
+            sound.stop()
         for i in range(len(WALLS)):
             if (WALLS[i][2] < 200 and WALLS[i][2] + 50 >= 188) and WALLS[i][3] < PLAYERPOS + 7 and WALLS[i][3] + \
                     WALLS[i][0] > PLAYERPOS - 7:
@@ -216,3 +222,6 @@ def game_scene():
             del WALLS[del_wall]
 
     pygame.display.flip()
+
+
+game_scene()
