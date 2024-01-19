@@ -3,6 +3,7 @@ import random
 
 import pygame
 
+file = [int(i) for i in open('money_and_meters.txt', mode='r')]  # файл для хранения метров и денег
 # параметры окна и карты
 WIND_WIDTH = 1400
 WIND_HEIGHT = 788
@@ -14,7 +15,12 @@ LEFT = 0
 TOP = 0
 BG_COLOR = pygame.Color(0, 0, 0)
 map_flag = True
+
+count_money = 0
+count_money_f = file[0]
+record_meters = file[1]
 meters = 1
+
 hp_count = 3
 backround_snd = "Music/game_music.mp3"
 Santa = pygame.image.load('Images/SantaTexture.png')
@@ -49,7 +55,7 @@ def picture(name):
 class Map(pygame.sprite.Sprite):
     image = picture(random.choice(['map.png', 'map2.png']))
 
-    def __init__(self, all_sprites, num=0):
+    def __init__(self, num=0):
         super().__init__(all_sprites)
         self.image = Map.image
         self.rect = self.image.get_rect()
@@ -62,10 +68,30 @@ class Map(pygame.sprite.Sprite):
                 self.image = picture(random.choice(['map2.png', 'map.png']))  # можно добавить другие картинки
 
 
-class Particle(pygame.sprite.Sprite):
+class Money(pygame.sprite.Sprite):
+    money = pygame.transform.scale(picture('money.png'), (20, 20))
+
+    def __init__(self):
+        super().__init__(all_sprites)
+        self.image = Money.money
+        self.rect = self.image.get_rect()
+        self.rect.x = random.randint(1000, 1400)  # границы в которых появляются монетки
+        self.rect.y = random.randint(50, 728)
+
+    def update(self):
+        global count_money
+        if map_flag:
+            self.rect = self.rect.move(-9, 0)
+        self.rect = self.rect.move(random.randrange(3) - 1, random.randrange(3) - 1)
+        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230):
+            count_money += 1
+            self.kill()
+
+
+class ParticleBroke(pygame.sprite.Sprite):
     # частицы разного размера
     fire = [picture("ice_broken.png")]
-    for scale in (5, 10, 20):
+    for scale in (5, 10, 15, 20):
         fire.append(pygame.transform.scale(fire[0], (scale, scale)))
 
     def __init__(self, pos, dx, dy):
@@ -82,20 +108,40 @@ class Particle(pygame.sprite.Sprite):
         self.rect.y += self.velocity[1]
 
 
-def create_particles(position):
-    # количество создаваемых частиц
-    particle_count = 30
-    # возможные скорости
-    numbers = range(-5, 6)
-    for _ in range(particle_count):
-        Particle(position, random.choice(numbers), random.choice(numbers))
+class ParticleFly(pygame.sprite.Sprite):
+    fire = [picture("snowflake.png")]
+    for scale in (5, 10):
+        fire.append(pygame.transform.scale(fire[0], (scale, scale)))
+
+    def __init__(self, pos, dx, dy):
+        super().__init__(all_sprites)
+        self.image = random.choice(self.fire)
+        self.rect = self.image.get_rect()
+        self.velocity = [dx, dy]
+        self.rect.x, self.rect.y = pos
+        self.gravity = GRAVITY
+
+    def update(self):
+        self.velocity[1] += self.gravity
+        self.rect.x += self.velocity[0]
+        self.rect.y += self.velocity[1]
+
+
+def create_particles(position, particle='fly'):
+    numbers = range(-5, 6)  # возможные скорости
+    if particle == 'broke':
+        for _ in range(30):
+            ParticleBroke(position, random.choice(numbers), random.choice(numbers))
+    if particle == 'fly':
+        for _ in range(10):
+            ParticleFly(position, random.choice(numbers), random.choice(numbers))
 
 
 nums = [0, 4000, 8000, 12000]  # кол-во пикселей через которое появляется новая картинка
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
 for i in range(4):
-    Map(all_sprites, nums[i])
+    Map(nums[i])
 
 
 def game_scene():
@@ -116,7 +162,7 @@ def game_scene():
     sound.set_volume(0)
     sound.play()
     lose_flag = False
-    Map(all_sprites)
+
     i = 0
     while i != 0.6:
         i += 0.1
@@ -126,12 +172,13 @@ def game_scene():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if lose_flag:
                     running = False
+
                 PLAYERCHANGE = 1
+                create_particles((150, PLAYERPOS + 50))
 
             if event.type == pygame.MOUSEBUTTONUP:
                 PLAYERCHANGE = 0
@@ -140,17 +187,21 @@ def game_scene():
         all_sprites.draw(screen)
         text_hp = font.render(f"{hp_count}", True, (255, 0, 0))
         text = font.render(f"{meters // 5}", True, (100, 100, 100))
+        text_money = font.render(f'{count_money}', True, pygame.Color('gold'))
         if map_flag:
             meters += 1
         screen.blit(text, (10, 10))
         screen.blit(text_hp, (1300, 10))
+        screen.blit(text_money, (10, 50))
 
         all_sprites.update()
         clock.tick(50)
 
+        if random.randint(0, 20) == 7 and map_flag:
+            Money()  # появления новых монеток
+
         # Рисуем персонажа
         if DONTLOSE == 1:
-            # pygame.draw.circle(screen, (PlayerColor, PlayerColor, PlayerColor), (200, PLAYERPOS), 15)
             iu = pygame.transform.rotozoom(Santa, -PLAYERVELOCITY * 3, 2)
             iur = iu.get_rect(centerx=200, centery=PLAYERPOS)
             screen.blit(iu, iur)
@@ -206,10 +257,9 @@ def game_scene():
         del_wall = 100  # число которое больше количества стенок
         if hp_count == 0:
             PlayerColor = 0
+            map = Map
             DONTLOSE = 0
-            map = Map(all_sprites)
             map_flag = False
-
             sound.stop()
             font = pygame.font.SysFont("Arial", 72)
             font1 = pygame.font.SysFont("Arial", 30)
@@ -218,10 +268,10 @@ def game_scene():
             press_text = font1.render("press mouse to countinue", True, "red")
 
             text_rect = game_over_text.get_rect()
-            text_rect.center = (WIND_WIDTH // 2, WIND_HEIGHT // 2)
+            text_rect.center = (WIND_WIDTH + 100, WIND_HEIGHT - 350)
 
             text1_rect = press_text.get_rect()
-            text1_rect.center = ((WIND_WIDTH // 2), (WIND_HEIGHT // 2) + 50)
+            text1_rect.center = ((WIND_WIDTH + 100), (WIND_HEIGHT) - 300)
 
             map.image.blit(game_over_text, text_rect)
             map.image.blit(press_text, text1_rect)
@@ -237,7 +287,7 @@ def game_scene():
                     DONTLOSE = 0
                     map_flag = False
 
-                create_particles((200, PLAYERPOS))
+                create_particles((200, PLAYERPOS), particle='broke')
                 del_wall = i
 
         if del_wall != 100:
@@ -245,5 +295,12 @@ def game_scene():
 
     pygame.display.flip()
 
+    file_w = open('money_and_meters.txt', mode='w')
+    file_w.seek(0)
+    if meters < record_meters:
+        file_w.write(f'{count_money_f + count_money}\n{record_meters // 5}')
+    else:
+        file_w.write(f'{count_money_f + count_money}\n{meters // 5}')
+    file_w.close()
 
-
+game_scene()
