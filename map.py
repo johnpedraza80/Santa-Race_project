@@ -303,4 +303,4 @@ def game_scene():
         file_w.write(f'{count_money_f + count_money}\n{meters // 5}')
     file_w.close()
 
-game_scene()
+
