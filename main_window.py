@@ -21,7 +21,6 @@ def load_image(name, colorkey=None):
     fullname = os.path.join('Images', name)
     # если файл не существует, то выходим
     if not os.path.isfile(fullname):
-
         sys.exit()
     image = pygame.image.load(fullname)
     return image
@@ -86,39 +85,41 @@ class Exit(pygame.sprite.Sprite):
             self.flag1 = True
 
 
-if __name__ == '__main__':
-    pygame.init()
-    menu = Menu(SIZE, BACKROUND_IMAGE)
-    menu.load_bg()
-    music_play.sound.play(-1)
-    button_play = Play(all_sprites)
-    button_exit = Exit(all_sprites)
-    all_sprites.draw(menu.screen)
-    running = True
-
-    image = load_image("cursor.png")
-    arrow = pygame.sprite.Sprite(all_sprites)
-    arrow.image = image
-    arrow.rect = arrow.image.get_rect()
-    pygame.mouse.set_visible(False)
-
-    while running:
-        all_sprites.draw(menu.screen)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN:
-                all_sprites.update(event)
-                if button_play.flag1:
-                    level_choice()
-                    running = False
-                if button_exit.flag1:
-                    running = False
-
-            if event.type == pygame.MOUSEMOTION:
-                with open("coords.txt", "w") as file:
-                    file.write(str(event.pos[0]) + " " + str(event.pos[1]))
-                arrow.rect.topleft = event.pos
-
-        pygame.display.flip()
+def main_wind():
+    if __name__ == '__main__':
+        pygame.init()
+        menu = Menu(SIZE, BACKROUND_IMAGE)
         menu.load_bg()
+        music_play.sound.play(-1)
+        button_play = Play(all_sprites)
+        button_exit = Exit(all_sprites)
+        all_sprites.draw(menu.screen)
+        running = True
+
+        image = load_image("cursor.png")
+        arrow = pygame.sprite.Sprite(all_sprites)
+        arrow.image = image
+        arrow.rect = arrow.image.get_rect()
+        pygame.mouse.set_visible(False)
+
+        while running:
+            all_sprites.draw(menu.screen)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    running = False
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    all_sprites.update(event)
+                    if button_play.flag1:
+                        level_choice()
+                        running = False
+                    if button_exit.flag1:
+                        running = False
+
+                if event.type == pygame.MOUSEMOTION:
+                    with open("coords.txt", "w") as file:
+                        file.write(str(event.pos[0]) + " " + str(event.pos[1]))
+                    arrow.rect.topleft = event.pos
+
+            pygame.display.flip()
+            menu.load_bg()
+main_wind()

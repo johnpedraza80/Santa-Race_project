@@ -1,6 +1,6 @@
 import os
 import random
-
+from levels import level_choice
 import pygame
 
 # параметры окна и карты
@@ -115,6 +115,7 @@ def game_scene():
     sound = pygame.mixer.Sound(backround_snd)
     sound.set_volume(0)
     sound.play()
+    lose_flag = False
     Map(all_sprites)
     i = 0
     while i != 0.6:
@@ -127,6 +128,9 @@ def game_scene():
             if event.type == pygame.QUIT:
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
+                if lose_flag:
+                    level_choice()
+                    running = False
                 PLAYERCHANGE = 1
 
             if event.type == pygame.MOUSEBUTTONUP:
@@ -203,8 +207,26 @@ def game_scene():
         if hp_count == 0:
             PlayerColor = 0
             DONTLOSE = 0
+            map = Map(all_sprites)
             map_flag = False
+
             sound.stop()
+            font = pygame.font.SysFont("Arial", 72)
+            font1 = pygame.font.SysFont("Arial", 30)
+
+            game_over_text = font.render("GAME OVER", True, "red")
+            press_text = font1.render("press mouse to countinue", True, "red")
+
+            text_rect = game_over_text.get_rect()
+            text_rect.center = (WIND_WIDTH // 2, WIND_HEIGHT // 2)
+
+            text1_rect = press_text.get_rect()
+            text1_rect.center = ((WIND_WIDTH // 2), (WIND_HEIGHT // 2) + 50)
+
+            map.image.blit(game_over_text, text_rect)
+            map.image.blit(press_text, text1_rect)
+            lose_flag = True
+
         for i in range(len(WALLS)):
             if (WALLS[i][2] < 200 and WALLS[i][2] + 50 >= 188) and WALLS[i][3] < PLAYERPOS + 7 and WALLS[i][3] + \
                     WALLS[i][0] > PLAYERPOS - 7:
@@ -224,3 +246,4 @@ def game_scene():
     pygame.display.flip()
 
 
+game_scene()
