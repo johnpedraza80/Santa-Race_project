@@ -192,7 +192,7 @@ def game_scene():
             meters += 1
         screen.blit(text, (10, 10))
         screen.blit(text_hp, (1300, 10))
-        screen.blit(text_money, (10, 50))
+        screen.blit(text_money, (10, 60))
 
         all_sprites.update()
         clock.tick(50)
