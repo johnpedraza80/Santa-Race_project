@@ -1,6 +1,6 @@
 import os
 import random
-from levels import level_choice
+
 import pygame
 
 # параметры окна и карты
@@ -126,10 +126,10 @@ def game_scene():
     while running:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if lose_flag:
-                    level_choice()
                     running = False
                 PLAYERCHANGE = 1
 
@@ -246,4 +246,4 @@ def game_scene():
     pygame.display.flip()
 
 
-game_scene()
+

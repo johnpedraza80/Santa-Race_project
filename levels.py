@@ -1,7 +1,7 @@
 import pygame
 import sys
 import os
-import map
+from map import game_scene
 import music_play
 
 SIZE = WIDTH, HEIGHT = 1400, 788
@@ -76,7 +76,8 @@ def level_choice():
                 all_sprites.update(event)
                 if level.flag1:
                     music_play.sound.stop()
-                    map.game_scene()
+
+                    game_scene()
 
                     running = False
 

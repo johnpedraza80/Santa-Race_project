@@ -122,4 +122,6 @@ def main_wind():
 
             pygame.display.flip()
             menu.load_bg()
+
+
 main_wind()
