@@ -83,7 +83,7 @@ class Money(pygame.sprite.Sprite):
         if map_flag:
             self.rect = self.rect.move(-9, 0)
         self.rect = self.rect.move(random.randrange(3) - 1, random.randrange(3) - 1)
-        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230):
+        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230) or not map_flag:
             count_money += 1
             self.kill()
 
@@ -198,6 +198,7 @@ def game_scene():
     global DONTLOSE
     global map_flag, meters, hp_count
     global NEW_WALL_HEIGHT
+    global WALLS
 
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
@@ -207,7 +208,7 @@ def game_scene():
     sound.set_volume(0)
     sound.play()
     lose_flag = False
-
+    win_flag = False
     i = 0
     while i != 0.6:
         i += 0.1
@@ -222,6 +223,9 @@ def game_scene():
                 if lose_flag:
                     restart()
                     lose_flag = False
+                if win_flag:
+                    restart()
+                    win_flag = False
 
                 PLAYERCHANGE = 1
                 create_particles((150, PLAYERPOS + 50))
@@ -239,8 +243,11 @@ def game_scene():
         screen.blit(text, (10, 10))
         screen.blit(text_hp, (1300, 10))
         screen.blit(text_money, (10, 60))
-        if not map_flag:
+        if lose_flag:
             text_gameover = font.render('GAME OVER', True, (255, 0, 0))
+            screen.blit(text_gameover, (500, 300))
+        if win_flag:
+            text_gameover = font.render('YOU WIN!', True, (255, 0, 0))
             screen.blit(text_gameover, (500, 300))
 
         all_sprites.update()
@@ -305,10 +312,12 @@ def game_scene():
                 MoveWalls += 1
         del_wall = 100  # число которое больше количества стенок
 
-        if meters // 5 == 640:
+        if meters // 5 == 580:
+            map_flag = False
+            WALLS = []
             PlayerColor = 0
             DONTLOSE = 0
-            map_flag = False
+            win_flag = True
             sound.stop()
         if hp_count == 0:
             PlayerColor = 0
@@ -345,4 +354,4 @@ def game_scene():
     file_w.close()
 
 
-game_scene()
+
