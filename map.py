@@ -85,7 +85,7 @@ class Money(pygame.sprite.Sprite):
         if map_flag:
             self.rect = self.rect.move(-9, 0)
         self.rect = self.rect.move(random.randrange(3) - 1, random.randrange(3) - 1)
-        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230) and map_flag:
+        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230) or not map_flag:
             count_money += 1
             self.kill()
 
@@ -139,7 +139,7 @@ def create_particles(position, particle='fly'):
             ParticleFly(position, random.choice(numbers), random.choice(numbers))
 
 
-nums = [0]  # кол-во пикселей через которое появляется новая картинка
+nums = [0]  # кол-во пикселей через которое появляется картинка
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
 for i in range(1):
@@ -210,6 +210,7 @@ def game_scene():
     sound.set_volume(0)
     sound.play()
     lose_flag = False
+    win_flag = False
 
     i = 0
     while i != 0.6:
@@ -225,6 +226,9 @@ def game_scene():
                 if lose_flag:
                     restart()
                     lose_flag = False
+                if win_flag:
+                    restart()
+                    win_flag = False
 
                 PLAYERCHANGE = 1
                 create_particles((200, PLAYERPOS + 10))
@@ -242,8 +246,11 @@ def game_scene():
         screen.blit(text, (10, 10))
         screen.blit(text_hp, (1300, 10))
         screen.blit(text_money, (10, 60))
-        if not map_flag:
+        if lose_flag:
             text_gameover = font.render('GAME OVER', True, (255, 0, 0))
+            screen.blit(text_gameover, (500, 300))
+        if win_flag:
+            text_gameover = font.render('YOU WIN!', True, (255, 0, 0))
             screen.blit(text_gameover, (500, 300))
 
         all_sprites.update()
@@ -315,6 +322,13 @@ def game_scene():
             sound.stop()
 
             lose_flag = True
+        if meters // 5 == 600:
+            WALLS = []
+            PlayerColor = 0
+            DONTLOSE = 0
+            map_flag = False
+            win_flag = True
+            sound.stop()
 
         for i in range(len(WALLS)):
             if (WALLS[i][2] < 200 and WALLS[i][2] + 50 >= 188) and WALLS[i][3] < PLAYERPOS + 7 and WALLS[i][3] + \
