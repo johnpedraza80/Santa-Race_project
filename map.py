@@ -34,7 +34,7 @@ random.seed(a=None, version=2)
 
 NewWallCoof = 0  # Коэффицент появления новой стены
 
-WALLS_TYPES = [[250, 50], [175, 50], [125, 50]]  # Типы препятствий
+WALLS_TYPES = [[250, 50], [150, 50], [100, 50]]  # Типы препятствий
 
 WALLS = []  # Список стенок на экране
 
@@ -53,7 +53,7 @@ def picture(name):
 
 
 class Map(pygame.sprite.Sprite):
-    image = picture(random.choice(['map.png', 'map2.png']))
+    image = picture('map.png')
 
     def __init__(self, num=0):
         super().__init__(all_sprites)
@@ -64,8 +64,10 @@ class Map(pygame.sprite.Sprite):
     def update(self):
         if map_flag:
             self.rect = self.rect.move(-5, 0)  # сдвиг картинки
-            if self.rect.x == 4000:
-                self.image = picture(random.choice(['map2.png', 'map.png']))  # можно добавить другие картинки
+            self.rect.y = 188
+            if self.rect.x == -1400:
+                self.rect.x = 0
+                self.image = picture('map.png')  # можно добавить другие картинки
 
 
 class Money(pygame.sprite.Sprite):
@@ -83,7 +85,7 @@ class Money(pygame.sprite.Sprite):
         if map_flag:
             self.rect = self.rect.move(-9, 0)
         self.rect = self.rect.move(random.randrange(3) - 1, random.randrange(3) - 1)
-        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230) or not map_flag:
+        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230) and map_flag:
             count_money += 1
             self.kill()
 
@@ -137,10 +139,10 @@ def create_particles(position, particle='fly'):
             ParticleFly(position, random.choice(numbers), random.choice(numbers))
 
 
-nums = [0, 4000, 8000, 12000]  # кол-во пикселей через которое появляется новая картинка
+nums = [0]  # кол-во пикселей через которое появляется новая картинка
 all_sprites = pygame.sprite.Group()
 clock = pygame.time.Clock()
-for i in range(4):
+for i in range(1):
     Map(nums[i])
 
 
@@ -160,10 +162,10 @@ def restart():
     global WALLS
     global WALLS_TYPES
 
-    nums = [0, 4000, 8000, 12000]
+    nums = [0]
     all_sprites = pygame.sprite.Group()
     clock = pygame.time.Clock()
-    for i in range(4):
+    for i in range(1):
         Map(nums[i])
 
     meters = 1
@@ -178,7 +180,7 @@ def restart():
     random.seed(a=None, version=2)
 
     NewWallCoof = 0  # Коэффицент появления новой стены
-    WALLS_TYPES = [[250, 50], [175, 50], [125, 50]]  # Типы препятствий
+    WALLS_TYPES = [[250, 50], [150, 50], [100, 50]]  # Типы препятствий
 
     WALLS = []  # Список стенок на экране
 
@@ -208,7 +210,7 @@ def game_scene():
     sound.set_volume(0)
     sound.play()
     lose_flag = False
-    win_flag = False
+
     i = 0
     while i != 0.6:
         i += 0.1
@@ -223,17 +225,14 @@ def game_scene():
                 if lose_flag:
                     restart()
                     lose_flag = False
-                if win_flag:
-                    restart()
-                    win_flag = False
 
                 PLAYERCHANGE = 1
-                create_particles((150, PLAYERPOS + 50))
+                create_particles((200, PLAYERPOS + 10))
 
             if event.type == pygame.MOUSEBUTTONUP:
                 PLAYERCHANGE = 0
 
-        screen.fill((0, 0, 0))
+        screen.fill((50, 50, 100))
         all_sprites.draw(screen)
         text_hp = font.render(f"{hp_count}", True, (255, 0, 0))
         text = font.render(f"{meters // 5}", True, (100, 100, 100))
@@ -243,11 +242,8 @@ def game_scene():
         screen.blit(text, (10, 10))
         screen.blit(text_hp, (1300, 10))
         screen.blit(text_money, (10, 60))
-        if lose_flag:
+        if not map_flag:
             text_gameover = font.render('GAME OVER', True, (255, 0, 0))
-            screen.blit(text_gameover, (500, 300))
-        if win_flag:
-            text_gameover = font.render('YOU WIN!', True, (255, 0, 0))
             screen.blit(text_gameover, (500, 300))
 
         all_sprites.update()
@@ -265,11 +261,11 @@ def game_scene():
         # Рисуем стены
 
         for WallsDraw in range(len(WALLS)):
-            pygame.draw.polygon(screen, (200, 255, 55), (
+            pygame.draw.polygon(screen, (200, 200, 250), (
                 (WALLS[WallsDraw][2], WALLS[WallsDraw][3]), (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3]),
                 (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3] + WALLS[WallsDraw][0]),
                 (WALLS[WallsDraw][2], WALLS[WallsDraw][3] + WALLS[WallsDraw][0])))
-        pygame.display.flip()
+
         # Добавляем новую стену
 
         WillAppearNewWall = random.randint(0, NewWallCoof)
@@ -311,15 +307,8 @@ def game_scene():
 
                 MoveWalls += 1
         del_wall = 100  # число которое больше количества стенок
-
-        if meters // 5 == 580:
-            map_flag = False
-            WALLS = []
-            PlayerColor = 0
-            DONTLOSE = 0
-            win_flag = True
-            sound.stop()
         if hp_count == 0:
+            WALLS = []
             PlayerColor = 0
             DONTLOSE = 0
             map_flag = False
@@ -343,7 +332,7 @@ def game_scene():
         if del_wall != 100:
             del WALLS[del_wall]
 
-    pygame.display.flip()
+        pygame.display.update()
 
     file_w = open('money_and_meters.txt', mode='w')
     file_w.seek(0)
@@ -352,6 +341,5 @@ def game_scene():
     else:
         file_w.write(f'{count_money_f + count_money}\n{meters // 5}')
     file_w.close()
-
 
 

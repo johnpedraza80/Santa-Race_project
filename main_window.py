@@ -40,7 +40,7 @@ class Menu:
         self.bg = pygame.image.load(self.bg_image)
 
     def load_bg(self):
-        # Загрузка заднего фона
+        # Загрузка заднего ajyf
         self.screen.blit(self.bg, (0, 0))
 
 
