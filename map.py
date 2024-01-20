@@ -144,6 +144,52 @@ for i in range(4):
     Map(nums[i])
 
 
+def restart():
+    global PLAYERPOS
+    global PLAYERVELOCITY
+    global PLAYERCHANGE
+    global NewWallCoof
+    global PlayerColor
+    global DONTLOSE
+    global map_flag, meters, hp_count
+    global NEW_WALL_HEIGHT
+    global count_money
+    global nums
+    global all_sprites
+    global clock
+    global WALLS
+    global WALLS_TYPES
+
+    nums = [0, 4000, 8000, 12000]
+    all_sprites = pygame.sprite.Group()
+    clock = pygame.time.Clock()
+    for i in range(4):
+        Map(nums[i])
+
+    meters = 1
+    map_flag = True
+    count_money = 0
+    hp_count = 3
+
+    PLAYERPOS = 550
+    PLAYERVELOCITY = 0
+    PLAYERCHANGE = 0
+
+    random.seed(a=None, version=2)
+
+    NewWallCoof = 0  # Коэффицент появления новой стены
+    WALLS_TYPES = [[250, 50], [175, 50], [125, 50]]  # Типы препятствий
+
+    WALLS = []  # Список стенок на экране
+
+
+    NEW_WALL_HEIGHT = 0
+    PlayerColor = 255
+    DONTLOSE = 1
+
+    game_scene()
+
+
 def game_scene():
     global PLAYERPOS
     global PLAYERVELOCITY
@@ -175,7 +221,8 @@ def game_scene():
                 running = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if lose_flag:
-                    running = False
+                    restart()
+                    lose_flag = False
 
                 PLAYERCHANGE = 1
                 create_particles((150, PLAYERPOS + 50))
@@ -261,6 +308,8 @@ def game_scene():
             DONTLOSE = 0
             map_flag = False
             sound.stop()
+
+            # Вывод текста "Вы проиграли"
             font = pygame.font.SysFont("Arial", 72)
             font1 = pygame.font.SysFont("Arial", 30)
 
@@ -268,10 +317,10 @@ def game_scene():
             press_text = font1.render("press mouse to countinue", True, "red")
 
             text_rect = game_over_text.get_rect()
-            text_rect.center = (WIND_WIDTH + 100, WIND_HEIGHT - 350)
+            text_rect.center = (300, 50)
 
             text1_rect = press_text.get_rect()
-            text1_rect.center = ((WIND_WIDTH + 100), (WIND_HEIGHT) - 300)
+            text1_rect.center = (300, 100)
 
             map.image.blit(game_over_text, text_rect)
             map.image.blit(press_text, text1_rect)
@@ -304,3 +353,4 @@ def game_scene():
     file_w.close()
 
 
+game_scene()
