@@ -309,21 +309,7 @@ def game_scene():
             map_flag = False
             sound.stop()
 
-            # Вывод текста "Вы проиграли"
-            font = pygame.font.SysFont("Arial", 72)
-            font1 = pygame.font.SysFont("Arial", 30)
 
-            game_over_text = font.render("GAME OVER", True, "red")
-            press_text = font1.render("press mouse to countinue", True, "red")
-
-            text_rect = game_over_text.get_rect()
-            text_rect.center = (300, 50)
-
-            text1_rect = press_text.get_rect()
-            text1_rect.center = (300, 100)
-
-            map.image.blit(game_over_text, text_rect)
-            map.image.blit(press_text, text1_rect)
             lose_flag = True
 
         for i in range(len(WALLS)):
