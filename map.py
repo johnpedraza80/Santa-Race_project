@@ -182,7 +182,6 @@ def restart():
 
     WALLS = []  # Список стенок на экране
 
-
     NEW_WALL_HEIGHT = 0
     PlayerColor = 255
     DONTLOSE = 1
@@ -240,6 +239,9 @@ def game_scene():
         screen.blit(text, (10, 10))
         screen.blit(text_hp, (1300, 10))
         screen.blit(text_money, (10, 60))
+        if not map_flag:
+            text_gameover = font.render('GAME OVER', True, (255, 0, 0))
+            screen.blit(text_gameover, (500, 300))
 
         all_sprites.update()
         clock.tick(50)
@@ -302,13 +304,17 @@ def game_scene():
 
                 MoveWalls += 1
         del_wall = 100  # число которое больше количества стенок
-        if hp_count == 0:
+
+        if meters // 5 == 640:
             PlayerColor = 0
-            map = Map
             DONTLOSE = 0
             map_flag = False
             sound.stop()
-
+        if hp_count == 0:
+            PlayerColor = 0
+            DONTLOSE = 0
+            map_flag = False
+            sound.stop()
 
             lose_flag = True
 
