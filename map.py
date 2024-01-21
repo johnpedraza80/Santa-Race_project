@@ -15,6 +15,7 @@ LEFT = 0
 TOP = 0
 BG_COLOR = pygame.Color(0, 0, 0)
 map_flag = True
+money_flag = False
 
 count_money = 0
 count_money_f = file[0]
@@ -32,7 +33,7 @@ PLAYERCHANGE = 0
 
 random.seed(a=None, version=2)
 
-NewWallCoof = 0  # Коэффицент появления новой стены
+new_wall_coof = 0  # Коэффицент появления новой стены
 
 WALLS_TYPES = [[250, 50], [150, 50], [100, 50]]  # Типы препятствий
 
@@ -77,17 +78,23 @@ class Money(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         self.image = Money.money
         self.rect = self.image.get_rect()
-        self.rect.x = random.randint(1000, 1400)  # границы в которых появляются монетки
+        self.rect.x = 1400  # границы в которых появляются монетки
         self.rect.y = random.randint(50, 728)
 
     def update(self):
-        global count_money
+        global count_money, money_flag
         if map_flag:
             self.rect = self.rect.move(-9, 0)
         self.rect = self.rect.move(random.randrange(3) - 1, random.randrange(3) - 1)
-        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170, 230) or not map_flag:
+        if self.rect.y in range(int(PLAYERPOS - 30), int(PLAYERPOS + 30)) and self.rect.x in range(170,
+                                                                                                   230) or not map_flag:
             count_money += 1
             self.kill()
+        if self.rect.x < 0:
+            self.kill()
+        if money_flag:
+            count_money += 100
+            money_flag = False
 
 
 class ParticleBroke(pygame.sprite.Sprite):
@@ -150,7 +157,7 @@ def restart():
     global PLAYERPOS
     global PLAYERVELOCITY
     global PLAYERCHANGE
-    global NewWallCoof
+    global new_wall_coof
     global PlayerColor
     global DONTLOSE
     global map_flag, meters, hp_count
@@ -161,6 +168,7 @@ def restart():
     global clock
     global WALLS
     global WALLS_TYPES
+
 
     nums = [0]
     all_sprites = pygame.sprite.Group()
@@ -179,28 +187,27 @@ def restart():
 
     random.seed(a=None, version=2)
 
-    NewWallCoof = 0  # Коэффицент появления новой стены
+    new_wall_coof = 0  # Коэффицент появления новой стены
     WALLS_TYPES = [[250, 50], [150, 50], [100, 50]]  # Типы препятствий
 
     WALLS = []  # Список стенок на экране
 
+
     NEW_WALL_HEIGHT = 0
     PlayerColor = 255
     DONTLOSE = 1
-
-    game_scene()
 
 
 def game_scene():
     global PLAYERPOS
     global PLAYERVELOCITY
     global PLAYERCHANGE
-    global NewWallCoof
+    global new_wall_coof
     global PlayerColor
     global DONTLOSE
     global map_flag, meters, hp_count
     global NEW_WALL_HEIGHT
-    global WALLS
+    global WALLS, count_money, money_flag
 
     pygame.init()
     screen = pygame.display.set_mode(SIZE)
@@ -225,6 +232,7 @@ def game_scene():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if lose_flag:
                     restart()
+                    sound.play()
                     lose_flag = False
                 if win_flag:
                     restart()
@@ -252,6 +260,7 @@ def game_scene():
         if win_flag:
             text_gameover = font.render('YOU WIN!', True, (255, 0, 0))
             screen.blit(text_gameover, (500, 300))
+            money_flag = True
 
         all_sprites.update()
         clock.tick(50)
@@ -267,25 +276,25 @@ def game_scene():
 
         # Рисуем стены
 
-        for WallsDraw in range(len(WALLS)):
+        for walls_draw in range(len(WALLS)):
             pygame.draw.polygon(screen, (200, 200, 250), (
-                (WALLS[WallsDraw][2], WALLS[WallsDraw][3]), (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3]),
-                (WALLS[WallsDraw][2] + 10, WALLS[WallsDraw][3] + WALLS[WallsDraw][0]),
-                (WALLS[WallsDraw][2], WALLS[WallsDraw][3] + WALLS[WallsDraw][0])))
+                (WALLS[walls_draw][2], WALLS[walls_draw][3]), (WALLS[walls_draw][2] + 10, WALLS[walls_draw][3]),
+                (WALLS[walls_draw][2] + 10, WALLS[walls_draw][3] + WALLS[walls_draw][0]),
+                (WALLS[walls_draw][2], WALLS[walls_draw][3] + WALLS[walls_draw][0])))
 
         # Добавляем новую стену
 
-        WillAppearNewWall = random.randint(0, NewWallCoof)
-        if WillAppearNewWall == 0:
-            TypeOfNewWall = random.randint(0, 2)
+        will_appear_new_wall = random.randint(0, new_wall_coof)
+        if will_appear_new_wall == 0:
+            type_of_new_wall = random.randint(0, 2)
             WALL_HEIGHT = random.randint(0 + ((1 - NEW_WALL_HEIGHT) * 400), 788 - (NEW_WALL_HEIGHT * 400) -
-                                         WALLS_TYPES[TypeOfNewWall][0])  # Определение высоты новой стенки
+                                         WALLS_TYPES[type_of_new_wall][0])  # Определение высоты новой стенки
 
-            WALLS.append([WALLS_TYPES[TypeOfNewWall][0], WALLS_TYPES[TypeOfNewWall][1], 1400, WALL_HEIGHT])
+            WALLS.append([WALLS_TYPES[type_of_new_wall][0], WALLS_TYPES[type_of_new_wall][1], 1400, WALL_HEIGHT])
             NEW_WALL_HEIGHT = 1 - NEW_WALL_HEIGHT
-            NewWallCoof = 50 // (400 // WALLS_TYPES[TypeOfNewWall][0])
+            new_wall_coof = 50 // (400 // WALLS_TYPES[type_of_new_wall][0])
         else:
-            NewWallCoof -= 1
+            new_wall_coof -= 1
 
             # Изменение скорости игрока
             if PLAYERCHANGE == 1 and PLAYERPOS > 50:
@@ -355,5 +364,3 @@ def game_scene():
     else:
         file_w.write(f'{count_money_f + count_money}\n{meters // 5}')
     file_w.close()
-
-
